@@ -2,10 +2,24 @@ const express = require("express");
 const app = express();
 
 const bcrypt = require("bcrypt");
-
-app.use(express.urlencoded({ extended: false }));
+const flash = require("express-flash");
+const session = require("express-session");
 
 app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: false }));
+app.use(flash());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+  })
+);
+
+const initializePassport = require("./passport-config");
+const passport = require("passport");
+const flash = require("express-flash");
+initializePassport(passport, (email) =>
+  users.find((user) => user.email === email)
+);
 
 const users = [];
 
@@ -33,7 +47,7 @@ app.post("/register", async (req, res) => {
       email,
       password: hashedPassword,
     });
-    console.log(users)
+    console.log(users);
     res.redirect("/login");
   } catch (error) {
     console.error(error);

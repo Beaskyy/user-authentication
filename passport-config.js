@@ -1,7 +1,7 @@
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 
-const initialize = (passport, getUserByEmail) => {
+const initialize = (passport, getUserByEmail, getUserById) => {
   const authenticateUser = async (email, password, done) => {
     const user = getUserByEmail(email);
     if (user == null) {
@@ -18,13 +18,12 @@ const initialize = (passport, getUserByEmail) => {
     }
   };
 
-  passport.use(new LocalStrategy({ usernameField: "email" }), authenticateUser);
+  passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
   passport.serializeUser((user, done) => {
-    // done(null, user.id);
+    done(null, user.id);
   });
   passport.deserializeUser((id, done) => {
-    // find user in db by id
-    // done(null, user)
+    return done(null, getUserById(id))
   });
 };
 
